@@ -36,7 +36,7 @@ class DCGAN():
     @tf.function
     def train_step(images):
         logs={}
-        noise = tf.random.normal([self.batch_size, noise_dim])
+        noise = tf.random.normal([self.batch_size, self.noise_dim])
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             generated_images = self.generator(noise, training=True)
@@ -110,13 +110,13 @@ class DCGAN():
         self.gen_loss_func,self.dis_loss_func=gen_loss[loss],dis_loss[loss]
         logs={}
 
-        self.build_optimizer(optimizer,learning_rate_gen,learning_rate_dis)
+        self.build_optimizer(optimizer,lr_gen,lr_dis)
 
         summary_writer = tf.summary.create_file_writer("./logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
         if initialize_wandboard:
             self.initialize_wandboard()
-        plot_noise = tf.random.normal([16, noise_dim])
-        for epoch in range(epoch):
+        plot_noise = tf.random.normal([16, self.noise_dim])
+        for epoch in range(epochs):
             start = time.time()
 
             isEnd=False

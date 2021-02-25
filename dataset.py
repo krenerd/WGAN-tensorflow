@@ -44,7 +44,7 @@ class DataLoader():
             self.iterator=iter(self.dataset.shuffle(self.image_num).batch(batch_size))
 
     def load_dataset_batch(self,path):
-        optional = iterator.get_next_as_optional()
+        optional = self.iterator.get_next_as_optional()
         if optional.has_value():
             return optional.get_value()
         else:
@@ -58,6 +58,6 @@ class DataLoader():
                 ds=self.dataset.shuffle(self.image_num).batch(num_samples)
             else:
                 ds=self.dataset.batch(num_samples)
-                
+
             for patch in ds:
                 return patch
