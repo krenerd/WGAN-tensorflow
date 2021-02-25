@@ -1,3 +1,5 @@
+import numpy as np
+import tensorflow as tf
 cross_entropy = tf.keras.losses.BinaryCrossentropy()
 def discriminator_loss(real_output, fake_output):
     real_loss = cross_entropy(tf.ones_like(real_output), real_output)

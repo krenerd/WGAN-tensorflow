@@ -19,8 +19,8 @@ class DCGAN():
 
         if weights=='' and disc_weights=='':
             #Build model when weight path is not given
-            generator_models={'DCGAN64':Models.build_generator64}
-            discriminator_models={'DCGAN64':Models.build_discriminator64}
+            generator_models={'DCGAN64':Models.build_generator64,'DCGAN32':Models.build_generator32}
+            discriminator_models={'DCGAN64':Models.build_discriminator64,'DCGAN32':Models.build_generator32}
             
             self.generator = generator_models[generator]
             self.discriminator = discriminator_models[discriminator]
@@ -84,14 +84,24 @@ class DCGAN():
             for key in history.keys():
                 tf.summary.scalar(key, history[key], step=step)
 
-    def train(self,dataset,epochs=10,lr_gen=0.001,lr_gen=0.001,batch_size=128,optimizer='adabound',loss='cce',evaluate_FID=True,
+    def build_optimizer(self,optimizer,lr_gen,lr_dis):
+        if optimizer=='sgd':
+            self.generator_optimizer = tf.keras.optimizers.SGD(lr_gen)
+            self.discriminator_optimizer = tf.keras.optimizers.SGD(lr_dis)
+        elif optimizer=='adam':
+            self.generator_optimizer = tf.keras.optimizers.Adam(lr_gen)
+            self.discriminator_optimizer = tf.keras.optimizers.Adam(lr_dis)
+        elif optimizer='adabound':
+            self.generator_optimizer = tf.keras.optimizers.Adam(lr_gen)
+            self.discriminator_optimizer = tf.keras.optimizers.Adam(lr_dis)
+
+    def train(self,dataset,epochs=10,lr_gen=0.001,lr_dis=0.001,batch_size=128,optimizer='adabound',loss='cce',evaluate_FID=True,
         evaluate_IS=True,generate_image=True):
 
         self.gen_loss_func,self.dis_loss_func=gen_loss[loss],dis_loss[loss]
         logs={'G_loss':[],'D_loss':[],'FID':[]}
 
-        self.generator_optimizer = tf.keras.optimizers.Adam(args.learning_rate_gen)
-        self.discriminator_optimizer = tf.keras.optimizers.Adam(args.learning_rate_dis)
+        self.build_optimizer(optimizer,args.learning_rate_gen,args.learning_rate_dis)
 
         summary_writer = tf.summary.create_file_writer("./logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
         plot_noise = tf.random.normal([16, noise_dim])
@@ -100,7 +110,7 @@ class DCGAN():
 
             isEnd=False
             while True:
-                image_batch=dataset.get_train(args.batch_size))
+                image_batch=dataset.get_train(args.batch_size)
                 # Check end of dataset
                 if image_batch==None:
                     break
