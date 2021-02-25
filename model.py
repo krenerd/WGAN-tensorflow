@@ -5,19 +5,19 @@ import tensorflow as tf
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import time
-
+import wandb
 from utils.losses import gen_loss,dis_loss
 import utils.model_architecture as Models
 import evaluate
 import datetime
 
 class DCGAN():
-    def __init__(self,gen_weights='',disc_weights='',generator='DCGAN64',discriminator='DCGAN64',noise_dim=100):
+    def __init__(self,gen_weights='',dis_weights='',generator='DCGAN64',discriminator='DCGAN64',noise_dim=100):
         self.noise_dim=noise_dim
 
         self.preprocessing=Models.build_input()
 
-        if weights=='' and disc_weights=='':
+        if gen_weights=='' and dis_weights=='':
             #Build model when weight path is not given
             generator_models={'DCGAN64':Models.build_generator64,'DCGAN32':Models.build_generator32}
             discriminator_models={'DCGAN64':Models.build_discriminator64,'DCGAN32':Models.build_generator32}
@@ -26,15 +26,17 @@ class DCGAN():
             self.discriminator = discriminator_models[discriminator]
         else:
             #Load model
-            self.generator = tf.keras.models.load_model(gen_weights,compile=False)
-            self.discriminator = tf.keras.models.load_model(disc_weights,compile=False)
+            if not gen_weights=='':
+                self.generator = tf.keras.models.load_model(gen_weights,compile=False)
+            if not dis_weights=='':
+                self.discriminator = tf.keras.models.load_model(disc_weights,compile=False)
 
             self.noise_dim=self.generator.input.shape[-1]
 
     @tf.function
     def train_step(images):
         logs={}
-        noise = tf.random.normal([args.batch_size, noise_dim])
+        noise = tf.random.normal([self.batch_size, noise_dim])
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             generated_images = self.generator(noise, training=True)
@@ -84,6 +86,12 @@ class DCGAN():
             for key in history.keys():
                 tf.summary.scalar(key, history[key], step=step)
 
+    def initialize_wandboard():
+        wandb.init(project="DCGAN", config={ })
+
+    def writewandboard(logs):
+        wandb.write(logs)
+
     def build_optimizer(self,optimizer,lr_gen,lr_dis):
         if optimizer=='sgd':
             self.generator_optimizer = tf.keras.optimizers.SGD(lr_gen)
@@ -91,47 +99,53 @@ class DCGAN():
         elif optimizer=='adam':
             self.generator_optimizer = tf.keras.optimizers.Adam(lr_gen)
             self.discriminator_optimizer = tf.keras.optimizers.Adam(lr_dis)
-        elif optimizer='adabound':
+        elif optimizer=='adabound':
             self.generator_optimizer = tf.keras.optimizers.Adam(lr_gen)
             self.discriminator_optimizer = tf.keras.optimizers.Adam(lr_dis)
 
     def train(self,dataset,epochs=10,lr_gen=0.001,lr_dis=0.001,batch_size=128,optimizer='adabound',loss='cce',evaluate_FID=True,
-        evaluate_IS=True,generate_image=True):
-
+        evaluate_IS=True,generate_image=True,log_wandb=False,log_tensorboard=True,log_name='DCGAN-tensorflow',initialize_wandboard=False):
+        #Initialize parameters for training
+        self.batch_size=batch_size
         self.gen_loss_func,self.dis_loss_func=gen_loss[loss],dis_loss[loss]
-        logs={'G_loss':[],'D_loss':[],'FID':[]}
+        logs={}
 
-        self.build_optimizer(optimizer,args.learning_rate_gen,args.learning_rate_dis)
+        self.build_optimizer(optimizer,learning_rate_gen,learning_rate_dis)
 
         summary_writer = tf.summary.create_file_writer("./logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+        if initialize_wandboard:
+            self.initialize_wandboard()
         plot_noise = tf.random.normal([16, noise_dim])
-        for epoch in range(args.epoch):
+        for epoch in range(epoch):
             start = time.time()
 
             isEnd=False
             while True:
-                image_batch=dataset.get_train(args.batch_size)
+                image_batch=dataset.get_train(self.batch_size)
                 # Check end of dataset
                 if image_batch==None:
                     break
 
                 history=self.train_step(image_batch)
-                logs['G_loss'].append(history['g_loss'])
-                logs['D_loss'].append(history['d_loss'])
+            
+            logs['G_loss']=history['g_loss']
+            logs['D_loss']=history['d_loss']
 
             # Produce images for the GIF as we go
             if generate_image:
                 self.generate_and_save_images(summary_writer,epoch + 1,plot_noise)
 
-            plot_losses(args,losses)
             print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
-            for image_batch in dataset.batch(args.samples_for_eval):
-                if args.dataset=='celeba':
-                    image_batch=image_batch['image']
+            image_batch=dataset.load_dataset_patch(is_random=False)
                 
-                if args.evaluate_FID:
-                    FID=get_FID(generator,image_batch)
-                    losses['FID'].append(FID)
-                    print('FID Score:',FID)
-                break
+            if evaluate_FID:
+                FID=evaluate.get_FID(generator,image_batch)
+                logs['FID']=FID
+                print('FID Score:',FID)
+            
+            if log_tensorboard:
+                write_tensorboard(summary_writer,logs,epoch)
+            if log_wandb:
+                write_wandboard(logs)
+
         self.save_model()

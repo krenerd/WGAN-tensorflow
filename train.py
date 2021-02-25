@@ -32,14 +32,14 @@ parser.add_argument("--generate_image", type=str2bool,default=True)
 parser.add_argument("--gen_weights", type=str,default='')
 parser.add_argument("--dis_weights", type=str,default='')
 
-parser.add_argument("--loss", type=str, choices=['cce','was'])
+parser.add_argument("--loss", type=str, choices=['cce','was'],default='cce')
 parser.add_argument("--optimizer", type=str, choices=['adam','sgd','adabound'],default='adam')
 parser.add_argument("--batch_size",type=int,default=64)
 parser.add_argument("--learning_rate_dis",type=float,default=0.001)
 parser.add_argument("--learning_rate_gen",type=float,default=0.001)
 
-parser.add_argument("--generator", type=str, choices=['DCGAN64','DCGAN32'])
-parser.add_argument("--discriminator", type=str, choices=['DCGAN64','DCGAN32'])
+parser.add_argument("--generator", type=str, choices=['DCGAN64','DCGAN32'],default='DCGAN64')
+parser.add_argument("--discriminator", type=str, choices=['DCGAN64','DCGAN32'],default='DCGAN64')
 if __name__ == '__main__':
     args = parser.parse_args()
     
