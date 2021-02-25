@@ -15,6 +15,8 @@ class DCGAN():
     def __init__(self,gen_weights='',disc_weights='',generator='DCGAN64',discriminator='DCGAN64',noise_dim=100):
         self.noise_dim=noise_dim
 
+        self.preprocessing=Models.build_input()
+
         if weights=='' and disc_weights=='':
             #Build model when weight path is not given
             generator_models={'DCGAN64':Models.build_generator64}

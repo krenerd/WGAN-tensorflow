@@ -25,7 +25,10 @@ parser.add_argument("--samples_for_eval", type=int,default=1000)
 parser.add_argument("--initial_epoch", type=int,default=0)
 parser.add_argument("--epoch", type=int,default=100)
 parser.add_argument("--evaluate_FID", type=str2bool,default=True)
+parser.add_argument("--evaluate_IS", type=str2bool,default=True)
+
 parser.add_argument("--load_model", type=str2bool,default=True)
+parser.add_argument("--loss", type=str, choices=['cce','was'])
 parser.add_argument("--optimizer", type=str, choices=['adam','sgd','adabound'])
 parser.add_argument("--dataset", type=str, choices=['celeba','cifar10'])
 parser.add_argument("--generate_image", type=str2bool,default=True)
@@ -40,4 +43,4 @@ if __name__ == '__main__':
     GAN=model.GAN(gen_weights=args.gen_weights,dis_weights=args.dis_weights,generator=args.generator,discriminator=args.discriminator
         )
     GAN.train(dataset,epochs=args.epoch,lr_gen=args.learning_rate_gen,lr_gen=args.learning_rate_dis,batch_size=args.batch_size,optimizer=args.optimizer,
-        loss='cce',evaluate_FID=True,evaluate_IS=True,generate_image=True)
+        loss=args.loss,evaluate_FID=args.evaluate_FID,evaluate_IS=args.evaluate_IS,generate_image=args.generate_image)
