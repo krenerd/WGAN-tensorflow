@@ -43,7 +43,7 @@ parser.add_argument("--discriminator", type=str, choices=['DCGAN64','DCGAN32'],d
 if __name__ == '__main__':
     args = parser.parse_args()
     
-    dataset=DataLoader()
+    dataset=DataLoader(tfds=args.tfds)
     GAN=model.DCGAN(gen_weights=args.gen_weights,dis_weights=args.dis_weights,generator=args.generator,discriminator=args.discriminator
         )
     GAN.train(dataset,epochs=args.epoch,lr_gen=args.learning_rate_gen,lr_dis=args.learning_rate_dis,batch_size=args.batch_size,optimizer=args.optimizer,

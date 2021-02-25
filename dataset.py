@@ -9,17 +9,17 @@ from tqdm import tqdm
 
 class DataLoader():
     #Load data patch by patch
-    def __init__(self,data_path='./data',data_type='cifar10',batch_size=128):
-        self.data_path = os.path.join(data_path,data_type)
-        if not os.path.exists(self.data_path):
-            os.mkdir(self.data_path)
-        
-        if data_type == 'cifar10':
-            print('Downloading CIFAR10 data')
-            ds=tfds.load('cifar10',data_dir=self.data_path)['train']
+    def __init__(self,data_path='./data',tfds='',batch_size=128):
+        if not tfds == '':
+            print(f'Downloading {tfds} data')
+            self.data_path = os.path.join(data_path,tfds)
+            if not os.path.exists(self.data_path):
+                os.mkdir(self.data_path)
+            ds=tfds.load(tfds,data_dir=self.data_path)['train']
+
             self.get_train=self.load_dataset_batch
 
-            print('Processing CIFAR10 data')
+            print(f'Processing {tfds} data')
             self.image_num=0
             arr=[]
             for image in tqdm(ds):
@@ -28,20 +28,7 @@ class DataLoader():
 
             self.dataset=tf.data.Dataset.from_tensor_slices(arr)
             self.iterator=iter(self.dataset.shuffle(self.image_num).batch(batch_size))
-        elif data_type == 'celeb_a':
-            print('Downloading celeba data')
-            ds=tfds.load('celeb_a',data_dir=self.data_path)['train']
-            self.get_train=self.load_dataset_batch
-
-            print('Processing celeba data')
-            self.image_num=0
-            arr=[]
-            for image in tqdm(ds):
-                self.image_num+=1
-                arr.append(image['image'])
-
-            self.dataset=tf.data.Dataset.from_tensor_slices(arr)
-            self.iterator=iter(self.dataset.shuffle(self.image_num).batch(batch_size))
+            self.data_type='tfds'
 
     def load_dataset_batch(self,path):
         optional = self.iterator.get_next_as_optional()
@@ -53,7 +40,7 @@ class DataLoader():
             return None
 
     def load_dataset_patch(num_samples,is_random=True):
-        if data_type == 'celeb_a' or data_type == 'cifar10':
+        if self.data_type=='tfds':
             if is_random:
                 ds=self.dataset.shuffle(self.image_num).batch(num_samples)
             else:
