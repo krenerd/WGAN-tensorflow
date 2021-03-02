@@ -54,19 +54,19 @@ def generate_and_save_images(model,images):
   plt.savefig(f'./final_image.png')
 
 def calculate_fid(act1,act2):
-  mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
-  mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
-  # calculate sum squared difference between means
-  ssdiff = np.sum((mu1 - mu2)**2.0)
-  # calculate sqrt of product between cov
-  covmean = scipy.linalg.sqrtm(sigma1.dot(sigma2))
-  # check and correct imaginary numbers from sqrt
-  if np.iscomplexobj(covmean):
-      covmean = covmean.real
-  # calculate score
-  fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
+    mu1, sigma1 = act1.mean(axis=0), np.cov(act1, rowvar=False)
+    mu2, sigma2 = act2.mean(axis=0), np.cov(act2, rowvar=False)
+    # calculate sum squared difference between means
+    ssdiff = np.sum((mu1 - mu2)**2.0)
+    # calculate sqrt of product between cov
+    covmean = scipy.linalg.sqrtm(sigma1.dot(sigma2))
+    # check and correct imaginary numbers from sqrt
+    if np.iscomplexobj(covmean):
+        covmean = covmean.real
+    # calculate score
+    fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
 
-  return fid
+    return fid
 def calculate_fid_score(gen_image,true_images):
   input_pipeline=tf.keras.models.Sequential([
     tf.keras.layers.experimental.preprocessing.Resizing(299, 299)
@@ -85,7 +85,11 @@ def calculate_fid_score(gen_image,true_images):
   act2=inception_model.predict(preprocessed_real)
   
   return calculate_fid(act1,act2)
-    
+  
+def get_FID(gen,images):
+    num_samples=images.shape[0]
+    seed = tf.random.normal([num_samples, noise_dim])
+    return evaluate.calculate_fid_score(gen.predict(seed),images)
 if __name__ == '__main__':
     args = parser.parse_args()
     tf.random.set_seed(42)

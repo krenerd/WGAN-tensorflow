@@ -102,10 +102,10 @@ class DCGAN():
         elif optimizer=='adabound':
             self.generator_optimizer = tf.keras.optimizers.Adam(lr_gen)
             self.discriminator_optimizer = tf.keras.optimizers.Adam(lr_dis)
-
+            
     def train(self,dataset,epochs=10,lr_gen=0.001,lr_dis=0.001,batch_size=128,optimizer='adabound',loss='cce',evaluate_FID=True,
             evaluate_IS=True,generate_image=True,log_wandb=False,log_tensorboard=True,log_name='DCGAN-tensorflow',initialize_wandboard=False,
-            log_times_in_epoch=10):
+            log_times_in_epoch=10,num_samples=1000):
         #Initialize parameters for training
         self.batch_size=batch_size
         self.gen_loss_func,self.dis_loss_func=gen_loss[loss],dis_loss[loss]
@@ -129,15 +129,15 @@ class DCGAN():
 
                 history=self.train_step(image_batch)
 
-                if count%log_times_in_epoch==0:
+                if count%log_period==0:
                     #Log current state to wandb, plot smaples...
                     logs['G_loss']=history['g_loss']
                     logs['D_loss']=history['d_loss']
                     print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
-                    image_batch=dataset.load_dataset_patch(is_random=False)
+                    image_batch=dataset.load_dataset_patch(num_samples,is_random=False)
                         
                     if evaluate_FID:
-                        FID=evaluate.get_FID(generator,image_batch)
+                        FID=evaluate.get_FID(self.generator,image_batch)
                         logs['FID']=FID
                         print('FID Score:',FID)
                     

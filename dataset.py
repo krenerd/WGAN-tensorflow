@@ -9,17 +9,17 @@ from tqdm import tqdm
 
 class DataLoader():
     #Load data patch by patch
-    def __init__(self,data_path='./data',tfds='',batch_size=128):
-        if not tfds == '':
-            print(f'Downloading {tfds} data')
-            self.data_path = os.path.join(data_path,tfds)
+    def __init__(self,data_path='./data',tfds_key='',batch_size=128):
+        if not tfds_key == '':
+            print(f'Downloading {tfds_key} data')
+            self.data_path = os.path.join(data_path,tfds_key)
             if not os.path.exists(self.data_path):
                 os.mkdir(self.data_path)
-            ds=tfds.load(tfds,data_dir=self.data_path)['train']
+            ds=tfds.load(tfds_key,data_dir=self.data_path)['train']
 
             self.get_train=self.load_dataset_batch
 
-            print(f'Processing {tfds} data')
+            print(f'Processing {tfds_key} data')
             self.image_num=0
             arr=[]
             for image in tqdm(ds):
@@ -39,7 +39,7 @@ class DataLoader():
             self.iterator=iter(self.dataset.shuffle(self.image_num).batch(batch_size))
             return None
 
-    def load_dataset_patch(num_samples,is_random=True):
+    def load_dataset_patch(self,num_samples,is_random=True):
         if self.data_type=='tfds':
             if is_random:
                 ds=self.dataset.shuffle(self.image_num).batch(num_samples)
