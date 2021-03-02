@@ -86,10 +86,11 @@ def calculate_fid_score(gen_image,true_images):
   
   return calculate_fid(act1,act2)
   
-def get_FID(gen,images):
+def get_FID(gen,images,noise_dim=100):
     num_samples=images.shape[0]
     seed = tf.random.normal([num_samples, noise_dim])
-    return evaluate.calculate_fid_score(gen.predict(seed),images)
+    return calculate_fid_score(gen.predict(seed),images)
+
 if __name__ == '__main__':
     args = parser.parse_args()
     tf.random.set_seed(42)
@@ -110,7 +111,7 @@ if __name__ == '__main__':
     generate_and_save_images(generator,truth_image)
     #Evaluate with FID
     num_examples_to_generate=args.samples
-    noise_dim=100
+    
     
     for batch in dataset.batch(num_examples_to_generate):
         truth_image=batch['image']

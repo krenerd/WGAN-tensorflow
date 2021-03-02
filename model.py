@@ -121,7 +121,9 @@ class DCGAN():
             start = time.time()
             count=0
             isEnd=False
+            pbar = tqdm(range(dataset.image_num))
             while True:
+                pbar.update(1)
                 image_batch=dataset.get_train(self.batch_size)
                 # Check end of dataset
                 if image_batch==None:
@@ -142,9 +144,9 @@ class DCGAN():
                         print('FID Score:',FID)
                     
                     if log_tensorboard:
-                        write_tensorboard(summary_writer,logs,epoch)
+                        self.write_tensorboard(summary_writer,logs,epoch)
                     if log_wandb:
-                        write_wandboard(logs)
+                        self.write_wandboard(logs)
                     #Log Complete
             # Plot sample images every epoch
             if generate_image:
