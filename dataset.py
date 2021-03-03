@@ -10,6 +10,7 @@ from tqdm import tqdm
 class DataLoader():
     #Load data patch by patch
     def __init__(self,data_path='./data',tfds_key='',batch_size=128):
+        self.batch_size=batch_size
         if not tfds_key == '':
             print(f'Downloading {tfds_key} data')
             self.data_path = os.path.join(data_path,tfds_key)
@@ -36,7 +37,7 @@ class DataLoader():
             return optional.get_value()
         else:
             #Reset iterator
-            self.iterator=iter(self.dataset.shuffle(self.image_num).batch(batch_size))
+            self.iterator=iter(self.dataset.shuffle(self.image_num).batch(self.batch_size))
             return None
 
     def load_dataset_patch(self,num_samples,is_random=True):

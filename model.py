@@ -29,7 +29,7 @@ class DCGAN():
             if not gen_weights=='':
                 self.generator = tf.keras.models.load_model(gen_weights,compile=False)
             if not dis_weights=='':
-                self.discriminator = tf.keras.models.load_model(disc_weights,compile=False)
+                self.discriminator = tf.keras.models.load_model(dis_weights,compile=False)
 
             self.noise_dim=self.generator.input.shape[-1]
 
@@ -57,7 +57,7 @@ class DCGAN():
             self.discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, self.discriminator.trainable_variables))
         return logs
 
-    def generate_and_save_images( self,summary_writer,epoch, test_input):
+    def generate_and_save_images( self,epoch, test_input):
         if not os.path.exists('./logs/images'):
             os.makedirs('./logs/images')
 
@@ -73,9 +73,6 @@ class DCGAN():
         plt.savefig(f'./logs/images/epoch_{epoch}.png')
         plt.close()
 
-        with summary_writer.as_default():
-            tf.summary.image("Training data", plt.imread(f'./logs/images/epoch_{epoch}.png'), step=epoch)
-
     def save_model(self):
         dir='./logs'
         self.generator.save(os.path.join(dir,'generator.h5'))
@@ -90,7 +87,7 @@ class DCGAN():
         wandb.init(project="DCGAN", config={ })
 
     def write_wandboard(self,logs):
-        wandb.write(logs)
+        wandb.log(logs)
 
     def build_optimizer(self,optimizer,lr_gen,lr_dis):
         if optimizer=='sgd':
@@ -110,7 +107,7 @@ class DCGAN():
         self.batch_size=batch_size
         self.gen_loss_func,self.dis_loss_func=gen_loss[loss],dis_loss[loss]
         logs={}
-        log_period=dataset.image_num//log_times_in_epoch
+        log_period=dataset.image_num//(log_times_in_epoch*batch_size)
         self.build_optimizer(optimizer,lr_gen,lr_dis)
 
         summary_writer = tf.summary.create_file_writer("./logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
@@ -152,5 +149,5 @@ class DCGAN():
             print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
             # Plot sample images every epoch
             if generate_image:
-                self.generate_and_save_images(summary_writer,epoch + 1,plot_noise)
+                self.generate_and_save_images(epoch + 1,plot_noise)
         self.save_model()
