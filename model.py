@@ -89,7 +89,7 @@ class DCGAN():
     def initialize_wandboard(self):
         wandb.init(project="DCGAN", config={ })
 
-    def writewandboard(self,logs):
+    def write_wandboard(self,logs):
         wandb.write(logs)
 
     def build_optimizer(self,optimizer,lr_gen,lr_dis):
@@ -123,6 +123,7 @@ class DCGAN():
             isEnd=False
             pbar = tqdm(range(dataset.image_num))
             while True:
+                count+=1
                 pbar.update(1)
                 image_batch=dataset.get_train(self.batch_size)
                 # Check end of dataset
@@ -135,7 +136,7 @@ class DCGAN():
                     #Log current state to wandb, plot smaples...
                     logs['G_loss']=history['g_loss']
                     logs['D_loss']=history['d_loss']
-                    print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
+                    
                     image_batch=dataset.load_dataset_patch(num_samples,is_random=False)
                         
                     if evaluate_FID:
@@ -148,6 +149,7 @@ class DCGAN():
                     if log_wandb:
                         self.write_wandboard(logs)
                     #Log Complete
+            print('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
             # Plot sample images every epoch
             if generate_image:
                 self.generate_and_save_images(summary_writer,epoch + 1,plot_noise)
