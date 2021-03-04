@@ -83,7 +83,7 @@ def build_discriminator32():
     model.add(layers.LeakyReLU())
 
     model.add(layers.Flatten())
-    model.add(layers.Dense(1,activation='sigmoid'))
+    model.add(layers.Dense(1))
 
     return model
 
