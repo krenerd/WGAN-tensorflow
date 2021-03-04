@@ -53,7 +53,6 @@ def build_discriminator64(image_size=(64,64),channels=64):
     return model
 
 def build_generator32():
-    
     model = tf.keras.Sequential()
     model.add(layers.Dense(8*8*256, use_bias=False, input_shape=(100,)))
     model.add(layers.BatchNormalization())
@@ -61,27 +60,19 @@ def build_generator32():
 
     model.add(layers.Reshape((8,8,256)))
 
-    model.add(layers.Conv2DTranspose(128, 3, strides=(1, 1), padding='same', use_bias=False))
+    model.add(layers.Conv2DTranspose(256, 4, strides=(1, 1), padding='same', use_bias=False))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2DTranspose(128, 3, strides=(2, 2), padding='same', use_bias=False))
+    model.add(layers.Conv2DTranspose(128, 4, strides=(2, 2), padding='same', use_bias=False))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2DTranspose(64, 3, strides=(1, 1), padding='same', use_bias=False))
+    model.add(layers.Conv2DTranspose(64, 4, strides=(2, 2), padding='same', use_bias=False))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2DTranspose(64, 3, strides=(2, 2), padding='same', use_bias=False))
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
-    
-    model.add(layers.Conv2DTranspose(64, 3, strides=(1, 1), padding='same', use_bias=False))
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
-
-    model.add(layers.Conv2DTranspose(3, 4, strides=(1, 1), padding='same', use_bias=False, activation='tanh'))
+    model.add(layers.Conv2DTranspose(3, 4, strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
     return model
 
 def build_discriminator32():
@@ -102,7 +93,7 @@ def build_discriminator32():
 
 def build_input(image_size=(64,64)):
     reshape=tf.keras.models.Sequential([
-      tf.keras.layers.experimental.preprocessing.Resizing(image_size[0],image_size[1]),
+      tf.keras.layers.experimental.preprocessing.Resizing(image_size[0],image_size[1],input_shape=(None,None,3)),
       tf.keras.layers.experimental.preprocessing.Rescaling(1./127.5,offset=-1)
     ])
     return reshape
