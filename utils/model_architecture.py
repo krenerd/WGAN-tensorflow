@@ -60,11 +60,7 @@ def build_generator32():
 
     model.add(layers.Reshape((8,8,256)))
 
-    model.add(layers.Conv2DTranspose(256, 4, strides=(1, 1), padding='same', use_bias=False))
-    model.add(layers.BatchNormalization())
-    model.add(layers.LeakyReLU())
-
-    model.add(layers.Conv2DTranspose(128, 4, strides=(2, 2), padding='same', use_bias=False))
+    model.add(layers.Conv2DTranspose(128, 4, strides=(1, 1), padding='same', use_bias=False))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
@@ -72,7 +68,7 @@ def build_generator32():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2DTranspose(3, 4, strides=(1, 1), padding='same', use_bias=False, activation='tanh'))
+    model.add(layers.Conv2DTranspose(3, 4, strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
     return model
 
 def build_discriminator32():
