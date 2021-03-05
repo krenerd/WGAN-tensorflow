@@ -13,7 +13,7 @@ class DataLoader():
         self.batch_size=batch_size
         if not tfds_key == '':
             print(f'Downloading {tfds_key} data')
-            self.data_path = os.path.join(data_path,tfds_key)
+            self.data_path = os.path.join(data_path,tfds_key.split('/')[0])
             if not os.path.exists(self.data_path):
                 os.mkdir(self.data_path)
             ds=tfds.load(tfds_key,data_dir=self.data_path)['train']

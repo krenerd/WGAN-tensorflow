@@ -45,12 +45,13 @@ parser.add_argument("--samples_for_eval", type=int,default=1000)
 parser.add_argument("--evaluate_FID", type=str2bool,default=True)
 parser.add_argument("--evaluate_IS", type=str2bool,default=True)
 parser.add_argument("--tfds", type=str)
+parser.add_argument("--data_path", type=str,defalut='./data')
 parser.add_argument("--generate_image", type=str2bool,default=True)
 
 if __name__ == '__main__':
     args = parser.parse_args()
     
-    dataset=DataLoader(tfds_key=args.tfds,batch_size=args.batch_size)
+    dataset=DataLoader(tfds_key=args.tfds,batch_size=args.batch_size,data_path=args.data_path)
     GAN=model.DCGAN(gen_weights=args.gen_weights,dis_weights=args.dis_weights,generator=args.generator,discriminator=args.discriminator
         )
     GAN.train(dataset,epochs=args.epoch,lr_gen=args.learning_rate_gen,lr_dis=args.learning_rate_dis,batch_size=args.batch_size,optimizer=args.optimizer,
