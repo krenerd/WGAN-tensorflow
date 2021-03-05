@@ -6,7 +6,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import time
 import wandb
-import utils.losses import L
+import utils.losses as L
 import utils.model_architecture as Models
 import evaluate
 import datetime
@@ -38,15 +38,17 @@ class DCGAN():
             g=L.generator_loss(fake_output)
         elif loss=='was':
             g=L.wasserstein_loss_generator(fake_output)
-        elif loss='wasgp':
+        elif loss=='wasgp':
             g=L.wasserstein_loss_generator(fake_output)
+
     def calculate_dis_loss(self,real_output, fake_output, real_images, fake_images):
         if loss=='cce':
             g=L.discriminator_loss(real_output,fake_output)
         elif loss=='was':
             g=L.wasserstein_loss_discriminator(real_output,fake_output)
-        elif loss='wasgp':
+        elif loss=='wasgp':
             g=L.wasserstein_loss_discriminator(real_output,fake_output) + self.gp_ratio * L.gradient_penalty(real_images, fake_images, self.discriminator)
+
     @tf.function
     def train_step(self,images):
         logs={}
@@ -117,10 +119,11 @@ class DCGAN():
 
     def train(self,dataset,epochs=10,lr_gen=0.001,lr_dis=0.001,batch_size=128,optimizer='adabound',loss='cce',evaluate_FID=True,
             evaluate_IS=True,generate_image=True,log_wandb=False,log_tensorboard=True,log_name='DCGAN-tensorflow',initialize_wandboard=False,
-            log_times_in_epoch=10,num_samples=1000):
+            log_times_in_epoch=10,num_samples=1000,gp_ratio=10.0):
         #Initialize parameters for training
         self.batch_size=batch_size
         self.loss=loss
+        self.gp_ratio=gp_ratio
         logs={}
         log_period=dataset.image_num//(log_times_in_epoch*batch_size)
         self.build_optimizer(optimizer,lr_gen,lr_dis)

@@ -34,6 +34,7 @@ parser.add_argument("--loss", type=str, choices=['cce','was','wasgp'],default='c
 parser.add_argument("--optimizer", type=str, choices=['adam','sgd','adabound'],default='adam')
 parser.add_argument("--generator", type=str, choices=['DCGAN64','DCGAN32'],default='DCGAN64')
 parser.add_argument("--discriminator", type=str, choices=['DCGAN64','DCGAN32'],default='DCGAN64')
+parser.add_argument("--gp_ratio", type=str2bool,default=False)
 
 parser.add_argument("--log_wandb", type=str2bool,default=False)
 parser.add_argument("--log_tensorboard", type=str2bool,default=True)
@@ -55,4 +56,4 @@ if __name__ == '__main__':
     GAN.train(dataset,epochs=args.epoch,lr_gen=args.learning_rate_gen,lr_dis=args.learning_rate_dis,batch_size=args.batch_size,optimizer=args.optimizer,
         loss=args.loss,evaluate_FID=args.evaluate_FID,evaluate_IS=args.evaluate_IS,generate_image=args.generate_image,num_samples=args.samples_for_eval,
         log_wandb=args.log_wandb,log_tensorboard=args.log_tensorboard,initialize_wandboard=args.initialize_wandboard,log_times_in_epoch=args.log_times_in_epoch,
-        log_name=args.log_name)
+        log_name=args.log_name,gp_ratio=args.gp_ratio)
