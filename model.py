@@ -35,19 +35,21 @@ class DCGAN():
 
     def calculate_gen_loss(self,fake_output):
         if self.loss=='cce':
-            g=L.generator_loss(fake_output)
+            l=L.generator_loss(fake_output)
         elif self.loss=='was':
-            g=L.wasserstein_loss_generator(fake_output)
+            l=L.wasserstein_loss_generator(fake_output)
         elif self.loss=='wasgp':
-            g=L.wasserstein_loss_generator(fake_output)
+            l=L.wasserstein_loss_generator(fake_output)
+        return l
 
     def calculate_dis_loss(self,real_output, fake_output, real_images, fake_images):
         if self.loss=='cce':
-            g=L.discriminator_loss(real_output,fake_output)
+            l=L.discriminator_loss(real_output,fake_output)
         elif self.loss=='was':
-            g=L.wasserstein_loss_discriminator(real_output,fake_output)
+            l=L.wasserstein_loss_discriminator(real_output,fake_output)
         elif self.loss=='wasgp':
-            g=L.wasserstein_loss_discriminator(real_output,fake_output) + self.gp_ratio * L.gradient_penalty(real_images, fake_images, self.discriminator)
+            l=L.wasserstein_loss_discriminator(real_output,fake_output) + self.gp_ratio * L.gradient_penalty(real_images, fake_images, self.discriminator)
+        return l
 
     @tf.function
     def train_step(self,images):
