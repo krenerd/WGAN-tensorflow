@@ -30,7 +30,7 @@ parser.add_argument("--batch_size",type=int,default=64)
 parser.add_argument("--learning_rate_dis",type=float,default=0.001)
 parser.add_argument("--learning_rate_gen",type=float,default=0.001)
 
-parser.add_argument("--loss", type=str, choices=['cce','was'],default='cce')
+parser.add_argument("--loss", type=str, choices=['cce','was','wasgp'],default='cce')
 parser.add_argument("--optimizer", type=str, choices=['adam','sgd','adabound'],default='adam')
 parser.add_argument("--generator", type=str, choices=['DCGAN64','DCGAN32'],default='DCGAN64')
 parser.add_argument("--discriminator", type=str, choices=['DCGAN64','DCGAN32'],default='DCGAN64')

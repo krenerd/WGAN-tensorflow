@@ -6,7 +6,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import time
 import wandb
-from utils.losses import gen_loss,dis_loss
+import utils.losses import L
 import utils.model_architecture as Models
 import evaluate
 import datetime
@@ -33,6 +33,20 @@ class DCGAN():
 
             self.noise_dim=self.generator.input.shape[-1]
 
+    def calculate_gen_loss(self,fake_output):
+        if loss=='cce':
+            g=L.generator_loss(fake_output)
+        elif loss=='was':
+            g=L.wasserstein_loss_generator(fake_output)
+        elif loss='wasgp':
+            g=L.wasserstein_loss_generator(fake_output)
+    def calculate_dis_loss(self,real_output, fake_output, real_images, fake_images):
+        if loss=='cce':
+            g=L.discriminator_loss(real_output,fake_output)
+        elif loss=='was':
+            g=L.wasserstein_loss_discriminator(real_output,fake_output)
+        elif loss='wasgp':
+            g=L.wasserstein_loss_discriminator(real_output,fake_output) + self.gp_ratio * L.gradient_penalty(real_images, fake_images, self.discriminator)
     @tf.function
     def train_step(self,images):
         logs={}
@@ -40,12 +54,13 @@ class DCGAN():
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             generated_images = self.generator(noise, training=True)
+            real_images = self.preprocessing(images)
 
-            real_output = self.discriminator(self.preprocessing(images), training=True)
+            real_output = self.discriminator(real_images, training=True)
             fake_output = self.discriminator(generated_images, training=True)
 
-            gen_loss = self.gen_loss_func(fake_output)
-            disc_loss = self.dis_loss_func(real_output, fake_output)
+            gen_loss = self.calculate_gen_loss(fake_output)
+            disc_loss = self.calculate_dis_loss(real_output, fake_output, real_images, generated_images)
 
             logs['g_loss']=gen_loss
             logs['d_loss']=disc_loss
@@ -99,13 +114,13 @@ class DCGAN():
         elif optimizer=='adabound':
             self.generator_optimizer = tf.keras.optimizers.Adam(lr_gen)
             self.discriminator_optimizer = tf.keras.optimizers.Adam(lr_dis)
-            
+
     def train(self,dataset,epochs=10,lr_gen=0.001,lr_dis=0.001,batch_size=128,optimizer='adabound',loss='cce',evaluate_FID=True,
             evaluate_IS=True,generate_image=True,log_wandb=False,log_tensorboard=True,log_name='DCGAN-tensorflow',initialize_wandboard=False,
             log_times_in_epoch=10,num_samples=1000):
         #Initialize parameters for training
         self.batch_size=batch_size
-        self.gen_loss_func,self.dis_loss_func=gen_loss[loss],dis_loss[loss]
+        self.loss=loss
         logs={}
         log_period=dataset.image_num//(log_times_in_epoch*batch_size)
         self.build_optimizer(optimizer,lr_gen,lr_dis)
