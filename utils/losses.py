@@ -11,10 +11,10 @@ def generator_loss(fake_output):
     return cross_entropy(tf.ones_like(fake_output), fake_output)
 
 def wasserstein_loss_generator(fake_output):
-    return tf.keras.reduce_mean(fake_output)
+    return tf.reduce_mean(fake_output)
 
 def wasserstein_loss_discriminator(real_output, fake_output):
-    return tf.keras.reduce_mean(real_output)+tf.keras.reduce_mean(fake_output)*-1
+    return tf.reduce_mean(real_output)+tf.reduce_mean(fake_output)*-1
 # Weight dictionary mapping keywords to functions. 
 gen_loss={'cce':generator_loss,'was':wasserstein_loss_generator}
 dis_loss={'cce':discriminator_loss,'was':wasserstein_loss_discriminator}
