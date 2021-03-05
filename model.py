@@ -54,7 +54,7 @@ class DCGAN():
     @tf.function
     def train_step(self,images):
         logs={}
-        noise = tf.random.normal([self.batch_size, self.noise_dim])
+        noise = tf.random.normal([images.shape[0], self.noise_dim])
 
         with tf.GradientTape() as gen_tape, tf.GradientTape() as disc_tape:
             generated_images = self.generator(noise, training=True)
