@@ -159,8 +159,11 @@ class DCGAN():
                     if evaluate_FID:
                         FID=evaluate.get_FID(self.generator,image_batch)
                         logs['FID']=FID
-                        print('FID Score:',FID)
-                    
+
+                    if evaluate_IS:
+                        IS=evaluate.get_IS(self.generator,num_samples)
+                        logs['IS']=IS
+
                     if log_tensorboard:
                         self.write_tensorboard(summary_writer,logs,epoch)
                     if log_wandb:

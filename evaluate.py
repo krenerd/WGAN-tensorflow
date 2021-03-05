@@ -77,15 +77,35 @@ def calculate_fid_score(gen_image,true_images):
   ])
   inception_model=tf.keras.applications.InceptionV3(include_top=False, pooling='avg', input_shape=(299,299,3))
   #Split the process to n_split mini batches
-  print('Preprocessing images')
+  #print('Preprocessing images')
   preprocessed_gen=input_pipeline(gen_image)
   preprocessed_real=input_pipeline_real(true_images)
-  print('Calculating FID score')
+  #print('Calculating FID score')
   act1=inception_model.predict(preprocessed_gen)
   act2=inception_model.predict(preprocessed_real)
   
   return calculate_fid(act1,act2)
-  
+def calculate_inception_score(images,eps=1E-16):
+    input_pipeline=tf.keras.models.Sequential([tf.keras.layers.experimental.preprocessing.Resizing(299, 299)])
+    inception_model=tf.keras.applications.inception_v3.InceptionV3(include_top=True, pooling='avg', input_shape=(299,299,3))
+
+    images = images.numpy().astype('float32')
+    images = input_pipeline.predict(images)
+    p_yx = inception_model.predict(images)
+
+    p_y = np.expand_dims(p_yx.mean(axis=0), 0)
+    kl_d = p_yx * (np.log(p_yx + eps) - np.log(p_y + eps))
+    sum_kl_d = kl_d.sum(axis=1)
+    
+    avg_kl_d = np.mean(sum_kl_d)
+    is_score = np.exp(avg_kl_d)
+    return is_score
+
+def get_IS(gen,num_samples=1000,noise_dim=100):
+    num_samples=images.shape[0]
+    seed = tf.random.normal([num_samples, noise_dim])
+    return calculate_inception_score(gen(seed, training=False))
+
 def get_FID(gen,images,noise_dim=100):
     num_samples=images.shape[0]
     seed = tf.random.normal([num_samples, noise_dim])
