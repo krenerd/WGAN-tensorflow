@@ -133,7 +133,7 @@ class DCGAN():
             start = time.time()
             count=0
             isEnd=False
-            pbar = tqdm(range(dataset.image_num))
+            pbar = tqdm(range(dataset.image_num//batch_size + 1))
             while True:
                 count+=1
                 pbar.update(1)
