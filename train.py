@@ -45,7 +45,7 @@ parser.add_argument("--samples_for_eval", type=int,default=1000)
 parser.add_argument("--evaluate_FID", type=str2bool,default=True)
 parser.add_argument("--evaluate_IS", type=str2bool,default=True)
 parser.add_argument("--tfds", type=str)
-parser.add_argument("--data_path", type=str,defalut='./data')
+parser.add_argument("--data_path", type=str,default='./data')
 parser.add_argument("--generate_image", type=str2bool,default=True)
 
 if __name__ == '__main__':
