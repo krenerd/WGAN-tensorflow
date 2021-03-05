@@ -34,19 +34,19 @@ class DCGAN():
             self.noise_dim=self.generator.input.shape[-1]
 
     def calculate_gen_loss(self,fake_output):
-        if loss=='cce':
+        if self.loss=='cce':
             g=L.generator_loss(fake_output)
-        elif loss=='was':
+        elif self.loss=='was':
             g=L.wasserstein_loss_generator(fake_output)
-        elif loss=='wasgp':
+        elif self.loss=='wasgp':
             g=L.wasserstein_loss_generator(fake_output)
 
     def calculate_dis_loss(self,real_output, fake_output, real_images, fake_images):
-        if loss=='cce':
+        if self.loss=='cce':
             g=L.discriminator_loss(real_output,fake_output)
-        elif loss=='was':
+        elif self.loss=='was':
             g=L.wasserstein_loss_discriminator(real_output,fake_output)
-        elif loss=='wasgp':
+        elif self.loss=='wasgp':
             g=L.wasserstein_loss_discriminator(real_output,fake_output) + self.gp_ratio * L.gradient_penalty(real_images, fake_images, self.discriminator)
 
     @tf.function
