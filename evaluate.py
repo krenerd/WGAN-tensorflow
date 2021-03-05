@@ -89,7 +89,7 @@ def calculate_fid_score(gen_image,true_images):
 def get_FID(gen,images,noise_dim=100):
     num_samples=images.shape[0]
     seed = tf.random.normal([num_samples, noise_dim])
-    return calculate_fid_score(gen.predict(seed),images)
+    return calculate_fid_score(gen(seed, training=False),images)
 
 if __name__ == '__main__':
     args = parser.parse_args()
