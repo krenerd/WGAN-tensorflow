@@ -10,6 +10,10 @@ from tqdm import tqdm
 class DataLoader():
     #Load data patch by patch
     def __init__(self,data_path='./data',tfds_key='',batch_size=128):
+        @tf.function()
+        def extract_image(data):
+            return data['image']
+
         self.batch_size=batch_size
         if not tfds_key == '':
             print(f'Downloading {tfds_key} data')
@@ -23,14 +27,11 @@ class DataLoader():
             self.get_train=self.load_dataset_batch
 
             print(f'Processing {tfds_key} data')
-            self.image_num=0
-            arr=[]
-            for image in tqdm(ds):
-                self.image_num+=1
-                arr.append(image['image'])
+            self.image_num=tqdm(ds).total
+            
+            self.dataset = ds.map(extract_image,num_parallel_calls=tf.data.AUTOTUNE)
 
-            self.dataset=tf.data.Dataset.from_tensor_slices(arr)
-            self.iterator=iter(self.dataset.shuffle(self.image_num).batch(batch_size))
+            self.iterator=iter(self.dataset.shuffle(1024).batch(batch_size))
             self.data_type='tfds'
 
     def load_dataset_batch(self,path):
@@ -39,7 +40,7 @@ class DataLoader():
             return optional.get_value()
         else:
             #Reset iterator
-            self.iterator=iter(self.dataset.shuffle(self.image_num).batch(self.batch_size))
+            self.iterator=iter(self.dataset.shuffle(1024).batch(self.batch_size))
             return None
 
     def load_dataset_patch(self,num_samples,is_random=True):
