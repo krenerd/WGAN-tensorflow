@@ -152,12 +152,11 @@ def build_discriminator32_wgangp():
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
-    model.add(layers.Conv2D(128, 3, strides=(2, 2), padding='same'))
+    model.add(layers.Conv2D(128, 3, strides=(1, 1), padding='same'))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
     
-    model.add(layers.Flatten())
-    model.add(layers.Dropout(0.5))
+    model.add(layers.GlobalAveragePooling2D())
     model.add(layers.Dense(1))
 
     return model
