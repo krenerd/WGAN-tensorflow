@@ -32,8 +32,8 @@ parser.add_argument("--learning_rate_gen",type=float,default=0.001)
 
 parser.add_argument("--loss", type=str, choices=['cce','was','wasgp'],default='cce')
 parser.add_argument("--optimizer", type=str, choices=['adam','sgd','adabound'],default='adam')
-parser.add_argument("--generator", type=str, choices=['DCGAN64','DCGAN32'],default='DCGAN64')
-parser.add_argument("--discriminator", type=str, choices=['DCGAN64','DCGAN32'],default='DCGAN64')
+parser.add_argument("--generator", type=str, choices=['DCGAN64','DCGAN32','WGAN32'],default='DCGAN64')
+parser.add_argument("--discriminator", type=str, choices=['DCGAN64','DCGAN32','WGAN32'],default='DCGAN64')
 parser.add_argument("--gp_ratio", type=str2bool,default=False)
 
 parser.add_argument("--log_wandb", type=str2bool,default=False)

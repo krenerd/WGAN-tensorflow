@@ -87,6 +87,81 @@ def build_discriminator32():
 
     return model
 
+def build_generator32_wgangp():
+    model = tf.keras.Sequential()
+    model.add(layers.Dense(4*4*256, use_bias=False, input_shape=(100,)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Reshape((4,4,256)))
+
+    model.add(layers.Conv2DTranspose(128, 3, strides=(1, 1), padding='same', use_bias=False))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2DTranspose(128, 3, strides=(2, 2), padding='same', use_bias=False))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2DTranspose(128, 3, strides=(1, 1), padding='same', use_bias=False))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2DTranspose(128, 3, strides=(2, 2), padding='same', use_bias=False))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2DTranspose(128, 3, strides=(1, 1), padding='same', use_bias=False))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2DTranspose(128, 3, strides=(2, 2), padding='same', use_bias=False))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2DTranspose(3, 4, strides=(1, 1), padding='same', use_bias=False, activation='tanh'))
+    return model
+
+def build_discriminator32_wgangp():
+    model = tf.keras.Sequential()
+    model.add(layers.Conv2D(128, 3, strides=(2, 2), padding='same',input_shape=(32,32,3)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2D(128, 3, strides=(1, 1), padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2D(128, 3, strides=(2, 2), padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2D(128, 3, strides=(1, 1), padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2D(128, 3, strides=(1, 1), padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2D(128, 3, strides=(1, 1), padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2D(128, 3, strides=(1, 1), padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+
+    model.add(layers.Conv2D(128, 3, strides=(2, 2), padding='same'))
+    model.add(layers.BatchNormalization())
+    model.add(layers.LeakyReLU())
+    
+    model.add(layers.Flatten())
+    model.add(layers.Dropout(0.5))
+    model.add(layers.Dense(1))
+
+    return model
+
 def build_input(image_size=(64,64)):
     reshape=tf.keras.models.Sequential([
       tf.keras.layers.experimental.preprocessing.Resizing(image_size[0],image_size[1],input_shape=(None,None,3)),

@@ -15,12 +15,12 @@ class DCGAN():
     def __init__(self,gen_weights='',dis_weights='',generator='DCGAN64',discriminator='DCGAN64',noise_dim=100):
         self.noise_dim=noise_dim
 
-        preprocessing_models={'DCGAN64':lambda :Models.build_input(),'DCGAN32':lambda :Models.build_input((32,32))}
+        preprocessing_models={'DCGAN64':lambda :Models.build_input(),'DCGAN32':lambda :Models.build_input((32,32)),'WGAN32':lambda :Models.build_input((32,32))}
         self.preprocessing=preprocessing_models[discriminator]()
         if gen_weights=='' and dis_weights=='':
             #Build model when weight path is not given
-            generator_models={'DCGAN64':Models.build_generator64,'DCGAN32':Models.build_generator32}
-            discriminator_models={'DCGAN64':Models.build_discriminator64,'DCGAN32':Models.build_discriminator32}
+            generator_models={'DCGAN64':Models.build_generator64,'DCGAN32':Models.build_generator32, 'WGAN32':Models.build_generator32_wgangp}
+            discriminator_models={'DCGAN64':Models.build_discriminator64,'DCGAN32':Models.build_discriminator32, 'WGAN32':Models.build_discriminator32_wgangp}
 
             self.generator = generator_models[generator]()
             self.discriminator = discriminator_models[discriminator]()
