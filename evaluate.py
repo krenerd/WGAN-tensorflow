@@ -85,6 +85,7 @@ def calculate_fid_score(gen_image,true_images):
   act2=inception_model.predict(preprocessed_real)
   
   return calculate_fid(act1,act2)
+  
 def calculate_inception_score(images,eps=1E-16):
     input_pipeline=tf.keras.models.Sequential([tf.keras.layers.experimental.preprocessing.Resizing(299, 299)])
     inception_model=tf.keras.applications.inception_v3.InceptionV3(include_top=True, pooling='avg', input_shape=(299,299,3))
@@ -102,7 +103,6 @@ def calculate_inception_score(images,eps=1E-16):
     return is_score
 
 def get_IS(gen,num_samples=1000,noise_dim=100):
-    num_samples=images.shape[0]
     seed = tf.random.normal([num_samples, noise_dim])
     return calculate_inception_score(gen(seed, training=False))
 
